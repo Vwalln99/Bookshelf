@@ -1,3 +1,4 @@
+
 function Book(title, author, pages, read) {
   this.title = title;
   this.author = author;
@@ -38,9 +39,6 @@ function Bookshelf() {
     const cards = document.querySelectorAll('.card');
     const removedCard = cards[index];
     removedCard.classList.remove('visible');
-    setTimeout(() => {
-      removedCard.remove();
-    }, 300);
     this.saveBooksToLocalStorage();
   }
 
