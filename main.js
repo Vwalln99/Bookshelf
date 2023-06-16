@@ -16,22 +16,38 @@ function Bookshelf() {
   this.toggleReadStatus = toggleReadStatus;
   this.displayBooks = displayBooks;
   this.setupEventListeners = setupEventListeners;
+  this.loadBooksFromLocalStorage = loadBooksFromLocalStorage;
+  this.saveBooksToLocalStorage = saveBooksToLocalStorage;
   this.setupEventListeners();
+  this.loadBooksFromLocalStorage();
 
   function addBookToLibrary(title, author, pages, read) {
     const newBook = new Book(title, author, pages, read);
     this.books.push(newBook);
     this.displayBooks();
+    const cards = document.querySelectorAll('.card');
+    const newCard = cards[cards.length - 1];
+    newCard.classList.add('visible');
+    this.addBookForm.classList.remove('visible');
+    this.saveBooksToLocalStorage();
   }
 
   function removeBookFromLibrary(index) {
     this.books.splice(index, 1);
     this.displayBooks();
+    const cards = document.querySelectorAll('.card');
+    const removedCard = cards[index];
+    removedCard.classList.remove('visible');
+    setTimeout(() => {
+      removedCard.remove();
+    }, 300);
+    this.saveBooksToLocalStorage();
   }
 
   function toggleReadStatus(index) {
     this.books[index].read = !this.books[index].read;
     this.displayBooks();
+    this.saveBooksToLocalStorage();
   }
 
   function displayBooks() {
@@ -66,55 +82,75 @@ function Bookshelf() {
       });
       card.appendChild(toggleButton);
       this.container.appendChild(card);
+
+      setTimeout(() => {
+        card.classList.add('visible');
+      }, 10);
     });
   }
 
   function setupEventListeners() {
     this.addBookButton.addEventListener('click', () => {
       this.addBookForm.classList.remove('hidden');
+      setTimeout(() => {
+        this.addBookForm.classList.add('visible');
+      }, 10);
     });
 
     this.cancelButton.addEventListener('click', () => {
-      this.addBookForm.classList.add('hidden');
-    });
-
-    const form = this.addBookForm.querySelector('form');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const titleInput = form.querySelector('#title');
-      const authorInput = form.querySelector('#author');
-      const pagesInput = form.querySelector('#pages');
-      const readInput = form.querySelector('#read');
-      const title = titleInput.value;
-      const author = authorInput.value;
-      const pages = parseInt(pagesInput.value);
-      const read = readInput.checked;
-
-
-      if (title && author && !isNaN(pages) && isValidTitle(title)) {
-        this.addBookToLibrary(title, author, pages, read);
-        titleInput.value = '';
-        authorInput.value = '';
-        pagesInput.value = '';
-        readInput.checked = false;
+      this.addBookForm.classList.remove('visible');
+      setTimeout(() => {
         this.addBookForm.classList.add('hidden');
-      } else {
-        alert('Invalid input. Book not added.');
-      }
+      }, 300);
     });
+  }
 
-    function isValidTitle(title) {
-      const alphanumericCharacters = 'abcdefghijklmnopqrstuvwxyzßABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:!?();, ';
-      for (let i = 0; i < title.length; i++) {
-        if (!alphanumericCharacters.includes(title[i])) {
-          return false;
-        }
-      }
-      return true;
+  const form = this.addBookForm.querySelector('form');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const titleInput = form.querySelector('#title');
+    const authorInput = form.querySelector('#author');
+    const pagesInput = form.querySelector('#pages');
+    const readInput = form.querySelector('#read');
+    const title = titleInput.value;
+    const author = authorInput.value;
+    const pages = parseInt(pagesInput.value);
+    const read = readInput.checked;
+
+    if (title && author && !isNaN(pages) && isValidTitle(title)) {
+      this.addBookToLibrary(title, author, pages, read);
+      titleInput.value = '';
+      authorInput.value = '';
+      pagesInput.value = '';
+      readInput.checked = false;
+      this.addBookForm.classList.add('hidden');
+    } else {
+      alert('Invalid input. Book not added.');
     }
+  });
+
+  function isValidTitle(title) {
+    const alphanumericCharacters = 'abcdefghijklmnopqrstuvwxyzßABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:!?();, ';
+    for (let i = 0; i < title.length; i++) {
+      if (!alphanumericCharacters.includes(title[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function loadBooksFromLocalStorage() {
+    const storedBooks = localStorage.getItem('books');
+    if (storedBooks) {
+      this.books = JSON.parse(storedBooks);
+      this.displayBooks();
+    }
+  }
+
+  function saveBooksToLocalStorage() {
+    localStorage.setItem('books', JSON.stringify(this.books));
   }
 }
 
-
-  const bookshelf = new Bookshelf();
+const bookshelf = new Bookshelf();
