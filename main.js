@@ -38,7 +38,6 @@ function Bookshelf() {
     this.displayBooks();
     const cards = document.querySelectorAll('.card');
     const removedCard = cards[index];
-    removedCard.classList.remove('visible');
     this.saveBooksToLocalStorage();
   }
 
@@ -89,17 +88,11 @@ function Bookshelf() {
 
   function setupEventListeners() {
     this.addBookButton.addEventListener('click', () => {
-      this.addBookForm.classList.remove('hidden');
-      setTimeout(() => {
-        this.addBookForm.classList.add('visible');
-      }, 10);
+      this.addBookForm.classList.add('visible');
     });
 
     this.cancelButton.addEventListener('click', () => {
       this.addBookForm.classList.remove('visible');
-      setTimeout(() => {
-        this.addBookForm.classList.add('hidden');
-      }, 300);
     });
   }
 
@@ -122,7 +115,6 @@ function Bookshelf() {
       authorInput.value = '';
       pagesInput.value = '';
       readInput.checked = false;
-      this.addBookForm.classList.add('hidden');
     } else {
       alert('Invalid input. Book not added.');
     }
